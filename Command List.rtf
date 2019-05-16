@@ -1,0 +1,41 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1671\cocoasubrtf400
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+\margl1440\margr1440\vieww10800\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 Command List\
+\
+VO	Opens or closes output valves\
+\
+The first numeric input defines which out valve you are addressing. There are currently 8 valves which can be addressed by 0-7.\
+\
+The second numeric input defines state. 1= ON, 0=OFF.\
+\
+<VO, 1 , 1> turns on the second output valve.\
+\
+VI	Opens of closes the input valves\
+\
+This works exactly like VO except there are only 3 input valves (0,1,2).\
+\
+0-Negative\
+1-Exhaust\
+2,Positive\
+\
+<VI, 0, 0> Turns off the negative input valve\
+\
+\
+PSP	Assigns a Setpoint pressure value for the positive chamber\
+\
+<PSP, 25> assigns a Setpoint of +25KPa\
+\
+\
+NSP	Assigns as Setpoint pressure value for the negative chamber\
+\
+<NSP, -25> assigns a Setpoint of -25KPa\
+\
+STATE	Reports the state of every component through the serial port\
+\
+\
+}
