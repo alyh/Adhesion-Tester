@@ -1,0 +1,44 @@
+running_test = true;
+paused = false;
+pause_time = 0;
+pause_target = 50;
+
+approach = true;
+dwell = false;
+retract = false;
+
+fprintf(step_motor, 'TA 0.1'); % acceleration time (s)
+fprintf(step_motor, 'TD 0.1'); % de-accerleration time (s)
+fprintf(step_motor, 'VS %s \n',num2str(approachrate)); % starting velocity (56 = 10um/s)
+fprintf(step_motor, 'VR %s \n',num2str(approachrate)); % running velocity
+
+% initial state
+change_valve_state(initialstate,onstate)
+pause(5)
+
+while(running_test)
+    if ~paused && approach
+        disp('Moving Surfaces together');
+        fprintf(step_motor, 'DIS 5000'); % distance to travel
+        fprintf(step_motor, 'MI'); % start motion
+        
+        %pause 5000/approachrate
+        pause_target = 100; % need to make this 5000/approach rate
+        approach = false;
+        dwell = true;
+        paused 
+        
+        %pause 1s
+    elseif ~paused && dwell
+        disp ('Surfaces are now together');
+    
+    elseif ~paused && retract
+        
+    else
+        pause_time = pause_time + 1;
+        if pause_time >= pause_target
+            paused = false;
+            pause_time = 0;
+        end
+    end
+end
