@@ -13,6 +13,10 @@ function [force_gauge, step_motor] = connect_instruments()
     fopen(step_motor);
     step_motor.RecordDetail ='Verbose';
     record(step_motor)
+    
+    pneumatics=serial('COM5');
+pneumatics.BaudRate=19200;
+fopen(pneumatics);
 
  fprintf(step_motor, 'TA 0.1'); % acceleration time (s)
  fprintf(step_motor, 'TD 0.1'); % de-accerleration time (s)

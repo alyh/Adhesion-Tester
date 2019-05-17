@@ -1,7 +1,8 @@
 delete(instrfind)
 clear;
 iMax = 2;
-jMax = 2;
+nrepeats = 3;
+global repeatnumber;
 global initialstate
 global teststate
 global onvalve
@@ -17,8 +18,11 @@ global nsp;
 testnumber=1;
 compiledmatrix=zeros(9,4);
 %% INPUT VARIABLES
-psp= 20; %positive pressure setpoint
-nsp=-20; %negative pressure setpoint
+psp=15;
+nspinitial=-5;
+nspstep=-5;
+nspmax=-25;
+nsp=0; %negative pressure setpoint
 dwelltime=5; %time sitting in contact state before retraction
 %-------------------
 approachrate_um =60*3;
@@ -57,30 +61,14 @@ fprintf('setting positive pressure to %d KPa \n',psp);
 fprintf('setting negative pressure to %d KPa \n',nsp);
 pause (10);
 %% Run tests
-for initialstate = 0:iMax
-    for teststate = 0:jMax
-    disp (' ');
-    if (initialstate==0)
-    disp ('APPROACH PRESSURE: NEGATIVE');
-    end
-    if (initialstate==1)
-    disp ('APPROACH PRESSURE: NEUTRAL');
-    end
-    if (initialstate==2)
-    disp ('APPROACH PRESSURE: POSITIVE');
-    end
-    if (teststate==0)
-    disp ('TEST PRESSURE: NEGATIVE');
-    end
-    if (teststate==1)
-    disp ('TEST PRESSURE: NEUTRAL');
-    end
-    if (teststate==2)
-    disp ('TEST PRESSURE: POSITIVE');
-    end
-    disp (' ');
+for nsp = nspinitial:nspstep:nspmax
+    for repeatnumber = 1:nrepeats
+        fprintf(pneumatics,'<NSP,%d>',nsp);
+        fprintf('Setpoint Pressure: %d KPa \n',nsp);
+        fprintf('Repeat Number: %d \n',repeatnumber);
+        pause(5)
+    run('RG_test_with_force')
     
-    run('single_channel_optimization_with_force')
     testnumber=testnumber+1;
     end
 end
