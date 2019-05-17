@@ -10,17 +10,20 @@ global force_gauge;
 global step_motor;
 global pneumatics;
 global dwelltime;
-%% INPUT VARIABLES
-psp= 20; %positive pressure setpoint
-nsp=-20; %negative pressure setpoint
-dwelltime=5; %time sitting in contact state before retraction
-%-------------------
+
+psp= 20;
+nsp=-20;
+dwelltime=5;
 approachrate_um =60*3;
 retractrate_um = 60*3;
+
 global approachrate;
 global retractrate;
 approachrate = int16(approachrate_um*5.65);
 retractrate = int16(retractrate_um*5.65);
+
+
+
 %% connect everything
     % These serial ports should be changed depending on the computer
 
@@ -73,7 +76,7 @@ for initialstate = 0:iMax
     disp ('TEST PRESSURE: POSITIVE');
     end
     disp (' ');
-    
+    disp ('running test');
     run('single_channel_optimization')
     
     end
