@@ -1,0 +1,48 @@
+Legend: 
+  * - An event occurred.
+  > - A write operation occurred.
+  < - A read operation occurred.
+ 
+1      Recording on 17-May-2019 at 16:22:08.467. Binary data in little endian format.
+2      > 7 ascii values.
+       TA 0.1
+
+3      > 7 ascii values.
+       TD 0.1
+
+4      > 9 ascii values.
+       VS 1017 
+
+5      > 9 ascii values.
+       VR 1017 
+
+6      > 9 ascii values.
+       DIS 5000
+
+7      > 3 ascii values.
+       MI
+
+8      > 10 ascii values.
+       DIS -5000
+
+9      > 3 ascii values.
+       MI
+
+10     > 7 ascii values.
+       TA 0.1
+
+11     > 7 ascii values.
+       TD 0.1
+
+12     > 9 ascii values.
+       VS 1017 
+
+13     > 9 ascii values.
+       VR 1017 
+
+14     > 9 ascii values.
+       DIS 5000
+
+15     > 3 ascii values.
+       MI
+

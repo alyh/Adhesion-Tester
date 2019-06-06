@@ -1,7 +1,8 @@
 delete(instrfind)
 clear;
 iMax = 2;
-jMax = 2;
+nrepeats = 3;
+global repeatnumber;
 global initialstate
 global teststate
 global onvalve
@@ -10,20 +11,26 @@ global force_gauge;
 global step_motor;
 global pneumatics;
 global dwelltime;
-
-psp= 20;
-nsp=-20;
-dwelltime=5;
+global compiledmatrix;
+global testnumber;
+global psp;
+global nsp;
+testnumber=1;
+compiledmatrix=zeros(9,4);
+%% INPUT VARIABLES
+psp=0;
+pspinitial=5
+pspstep=5
+pspmax=25
+nsp=-20; %negative pressure setpoint
+dwelltime=5; %time sitting in contact state before retraction
+%-------------------
 approachrate_um =60*3;
 retractrate_um = 60*3;
-
 global approachrate;
 global retractrate;
 approachrate = int16(approachrate_um*5.65);
 retractrate = int16(retractrate_um*5.65);
-
-
-
 %% connect everything
     % These serial ports should be changed depending on the computer
 
@@ -54,34 +61,18 @@ fprintf('setting positive pressure to %d KPa \n',psp);
 fprintf('setting negative pressure to %d KPa \n',nsp);
 pause (10);
 %% Run tests
-for initialstate = 0:iMax
-    for teststate = 0:jMax
-    disp (' ');
-    if (initialstate==0)
-    disp ('APPROACH PRESSURE: NEGATIVE');
-    end
-    if (initialstate==1)
-    disp ('APPROACH PRESSURE: NEUTRAL');
-    end
-    if (initialstate==2)
-    disp ('APPROACH PRESSURE: POSITIVE');
-    end
-    if (teststate==0)
-    disp ('TEST PRESSURE: NEGATIVE');
-    end
-    if (teststate==1)
-    disp ('TEST PRESSURE: NEUTRAL');
-    end
-    if (teststate==2)
-    disp ('TEST PRESSURE: POSITIVE');
-    end
-    disp (' ');
-    disp ('running test');
-    run('single_channel_optimization')
+for psp = pspinitial:pspstep:pspmax
+    for repeatnumber = 1:nrepeats
+        fprintf(pneumatics,'<PSP,%d>',psp);
+        fprintf('Setpoint Pressure: %d KPa \n',psp);
+        fprintf('Repeat Number: %d \n',repeatnumber);
+        pause(5)
+    run('EA_Test_with_force')
     
+    testnumber=testnumber+1;
     end
 end
-
+writematrix(compiledmatrix,['data/',datestr(now,'mm-dd-yyyy-HHMM'),'compileddata.csv'])
 disp('all tests done, setting setpoints to 0, exhausting and disconnecting');
 fprintf (pneumatics,'<PSP,0>');
 fprintf (pneumatics,'<NSP,0>');

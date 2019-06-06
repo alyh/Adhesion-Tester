@@ -18,14 +18,25 @@ fprintf(step_motor, 'TA 0.1'); % acceleration time (s)
 fprintf(step_motor, 'TD 0.1'); % de-accerleration time (s)
 fprintf(step_motor, 'VS %s \n',num2str(approachrate)); % starting velocity (56 = 10um/s)
 fprintf(step_motor, 'VR %s \n',num2str(approachrate)); % running velocity
+%% initial state
+% close all output valves
+    for i=0:7
+        fprintf (pneumatics, '<VO,%d,0>',i');
+    end
 
-%pretest state 
-
-
-% initial state
+    % close all input valves
+    for i=0:2
+        fprintf (pneumatics, '<VI,%d,0>',i');
+    end
+fprintf (pneumatics, '<VI,0,1>'); %turn on negative state
+% open all output valves
+    for i=0:7
+        fprintf (pneumatics, '<VO,%d,1>',i');
+    end
+pause(5)
 change_valve_state(pneumatics,initialstate,onvalve)
 pause(5)
-
+%% test
 while(running_test)
     
     % record force
@@ -79,7 +90,7 @@ while(running_test)
     
     pause(reading_delay);
 end
-compiledmatrix(testnumber,:) = [ initialstate, teststate, min(data), max(data)] 
+compiledmatrix(testnumber,:) = [ onvalve,initialstate, teststate, min(data), max(data)] 
 % SAVE DATA SOMEWHERE HERE
 writematrix(data,['data/',datestr(now,'mm-dd-yyyy-HHMM'),'-test',num2str(initialstate),'-',num2str(teststate),'.csv'])
 

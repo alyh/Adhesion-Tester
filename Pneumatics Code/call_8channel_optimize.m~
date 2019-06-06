@@ -57,6 +57,8 @@ fprintf('setting positive pressure to %d KPa \n',psp);
 fprintf('setting negative pressure to %d KPa \n',nsp);
 pause (10);
 %% Run tests
+
+for onvalve = 0:7
 for initialstate = 0:iMax
     for teststate = 0:jMax
     disp (' ');
@@ -83,6 +85,7 @@ for initialstate = 0:iMax
     run('single_channel_optimization_with_force')
     testnumber=testnumber+1;
     end
+end
 end
 writematrix(compiledmatrix,['data/',datestr(now,'mm-dd-yyyy-HHMM'),'compileddata.csv'])
 disp('all tests done, setting setpoints to 0, exhausting and disconnecting');

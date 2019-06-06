@@ -1,4 +1,4 @@
-function [] = change_valve_state(input_state,output_state)
+function [] = change_valve_state(pneumatics,input_state,output_state)
     % close all output valves
     for i=0:7
         fprintf (pneumatics, '<VO,%d,0>',i');

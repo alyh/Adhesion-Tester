@@ -19,11 +19,11 @@ fprintf(step_motor, 'TD 0.1'); % de-accerleration time (s)
 fprintf(step_motor, 'VS %s \n',num2str(approachrate)); % starting velocity (56 = 10um/s)
 fprintf(step_motor, 'VR %s \n',num2str(approachrate)); % running velocity
 
-%pretest state 
-
-
-% initial state
-change_valve_state(pneumatics,initialstate,onvalve)
+%% initial state is negative 
+fprintf(pneumatics,'<VO,0,1>');
+fprintf(pneumatics,'<VI,0,1>');
+fprintf(pneumatics,'<VI,1,0>');
+fprintf(pneumatics,'<VI,2,0>');
 pause(5)
 
 while(running_test)
@@ -48,10 +48,12 @@ while(running_test)
         
     elseif ~paused && dwell
         disp ('Surfaces are now together');
-        disp('Setting Channels to Test State');
-        change_valve_state(pneumatics,teststate,onvalve)
+        disp('Sitting at positive pressure for 60s');
+        fprintf(pneumatics,'<VI,0,0>');
+        fprintf(pneumatics,'<VI,2,1>');
         
-        pause_target = dwelltime/reading_delay; % dwell time 5s right now
+        
+        pause_target = 60/reading_delay; % dwell time 60s right now
         dwell = false;
         retract = true;
         paused = true;
@@ -79,8 +81,8 @@ while(running_test)
     
     pause(reading_delay);
 end
-compiledmatrix(testnumber,:) = [ initialstate, teststate, min(data), max(data)] 
-% SAVE DATA SOMEWHERE HERE
-writematrix(data,['data/',datestr(now,'mm-dd-yyyy-HHMM'),'-test',num2str(initialstate),'-',num2str(teststate),'.csv'])
+compiledmatrix(testnumber,:) = [ psp, repeatnumber, min(data), max(data)] 
+
+writematrix(data,['data/',datestr(now,'mm-dd-yyyy-HHMM'),'-EAtest',num2str(psp),'-',num2str(repeatnumber),'.csv'])%change this to say what pressure is and what number test this is
 
 disp('Test done!')
