@@ -4,9 +4,9 @@ function [data] = run_force_test(target_preload, force_gauge, step_motor)
     % Set parameters of step motor
     fprintf(step_motor, 'TA 0.1'); % acceleration time (s)
     fprintf(step_motor, 'TD 0.1'); % de-accerleration time (s)
-    fprintf(step_motor, 'VS 56'); % starting velocity (56 = 10um/s)
-    fprintf(step_motor, 'VR 56'); % running velocity
-    fprintf(step_motor, 'DIS 4000'); % distance to travel
+    fprintf(step_motor, 'VS 28'); % starting velocity (56 = 10um/s)
+    fprintf(step_motor, 'VR 28'); % running velocity
+    fprintf(step_motor, 'DIS 6000'); % distance to travel
     fprintf(step_motor, 'MI'); % start motion
 
     running_test = true;
@@ -58,7 +58,7 @@ function [data] = run_force_test(target_preload, force_gauge, step_motor)
                 dwelling=false;
                 
                 % once we're done dwelling, move all the way back.
-                fprintf(step_motor, 'DIS -3000');
+                fprintf(step_motor, 'DIS -7000');
                 fprintf(step_motor,'MI');
                 disp('Done dwelling, unadhering...');
             end

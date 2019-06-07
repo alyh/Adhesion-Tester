@@ -5,65 +5,59 @@ v  = VideoReader('videos/new dino videos/4N preload test1.wmv.mp4');
 adhesion_data = csvread('data/05-28-2019 15:37- new dino fixture - 4N preload.csv');
 output_file = 'output/new dino videos/4N.csv';
 
-full_intensity = [];
+frame_skipping =  3;
+full_intensity = zeros(length(1:frame_skipping:v.NumberOfFrames),1);
 count = 1;
 
-all_bw = [];
-
 disp('Reading video frames')
-previousCenters = [];
-lost=[];
-ncount=1;
-numDetached=[];
-detachedList=[0.0 0.0 0.0];
 
-for i=580:648
+for i=1:frame_skipping:v.NumberOfFrames
     % read frame as image and convert to grayscale
     frame = read(v,i);
     frame_bw = rgb2gray(frame);
-    % measure intensity of entire image (analogue to # of pillars for now)
-    [full_intensity(count),centers,radii] = pillar_counter(frame_bw);
-   % all_bw(:,:,count) = final_bw;
-
-    centers(find(radii>6),:)=[];
-    radii(find(radii>6))=[];
-    
-    if isempty(previousCenters)
-        previousCenters =  centers;
-    end
-    
-    detached = 0;
-    for j=1:length(radii)
-        d=pdist2(centers(j,:),previousCenters);
-        if length(find(d<6,1)) >= 1    
-            continue
-        end
-        
-        d2 = pdist2(centers(j,:),detachedList(:,1:2));
-        if length(find(d2<6,1)) >= 1
-            disp(['replaced ',num2str(detachedList(find(d2<6,1),3)),' with ',num2str(length(find(d<20)))])
-            detachedList(find(d2<6,1),:) = [centers(j,:),length(find(d<20))];
-           
-        else        
-            detachedList(ncount,:) = [centers(j,:),length(find(d<20))];
-            ncount = ncount+1;
-        end
-        
-    end
-    numDetached(count) = detached;
+    % measure intensity of entire image 
+    full_intensity(count) = sum(sum(frame_bw));
     count = count +1;
-    previousCenters =  centers;
 end
 
+disp('Finished reading video frames')
+%% Find pillar guide and extract # of pillars
+[~,guide_index] = max(full_intensity);
+guide_index =  guide_index * frame_skipping;
+guide_frame = rgb2gray(read(v,guide_index));
+guide_frame = imadjust(guide_frame);
+%guide_frame = imsharpen(guide_frame,'Radius',2,'Amount',1);
 
+[centers,radii]=imfindcircles(guide_frame,[5 9],'ObjectPolarity','dark', ...
+    'Sensitivity',0.96,'EdgeThreshold',0.15);
+
+centers(find(radii>7.5),:)=[];
+radii(find(radii>7.5))=[];
+
+imshow(guide_frame)
+viscircles(centers,radii*1.5,'LineWidth',1);
+%% Get intensity of pillars over time
+
+circ_int = zeros(length(radii),length(v.NumberOfFrames));
+radii =  radii.*1.5;
+
+for i=1:v.NumberOfFrames
+    frame = read(v,i);
+    frame_bw = rgb2gray(frame);
+    
+    for j=1:length(radii)
+        circ_int(j,i) = find_circle_intensity(centers(j,1),centers(j,2),radii(j),frame_bw);
+    end
+    disp([num2str(i),'/',num2str(v.NumberOfFrames)])
+end
 
 %% Extract the region where the pillars attach/unattach in the video
 disp('Extracting relevant frames')
-%full_intensity(25:35)=0
+
 intensity_region = find(full_intensity > 5);
 intensity = full_intensity(intensity_region(1):intensity_region(end));
 % normalize intensity
-%intensity = (intensity-min(intensity))./max(intensity-min(intensity));
+intensity = (intensity-min(intensity))./max(intensity-min(intensity));
 
 %% Read force data and plot with pillar data
 disp('Plotting intensity with adhesion force')
