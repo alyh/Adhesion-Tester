@@ -1,9 +1,9 @@
 %% Video importing
 
 % read entire video
-v  = VideoReader('videos/new dino videos/4N preload test1.wmv.mp4');
-adhesion_data = csvread('data/05-28-2019 15:37- new dino fixture - 4N preload.csv');
-output_file = 'output/new dino videos/4N.csv';
+v  = VideoReader('videos/new dino videos/10N preload test1.wmv.mp4');
+adhesion_data = csvread('data/05-28-2019 15:43- new dino fixture - 10N preload.csv');
+output_file = 'output/new dino videos/10N.csv';
 
 frame_skipping =  3;
 full_intensity = zeros(length(1:frame_skipping:v.NumberOfFrames),1);
@@ -31,15 +31,15 @@ guide_frame = imadjust(guide_frame);
 [centers,radii]=imfindcircles(guide_frame,[5 9],'ObjectPolarity','dark', ...
     'Sensitivity',0.96,'EdgeThreshold',0.15);
 
-centers(find(radii>7.5),:)=[];
-radii(find(radii>7.5))=[];
+centers(find(radii>6.3),:)=[]; %7.5 for 4N test2 sample
+radii(find(radii>6.3))=[];
 
 imshow(guide_frame)
-viscircles(centers,radii*1.5,'LineWidth',1);
+viscircles(centers,radii*1.48,'LineWidth',1);
 %% Get intensity of pillars over time
 
 circ_int = zeros(length(radii),length(v.NumberOfFrames));
-radii =  radii.*1.5;
+radii =  radii.*1.48;
 
 for i=1:v.NumberOfFrames
     frame = read(v,i);
@@ -50,6 +50,50 @@ for i=1:v.NumberOfFrames
     end
     disp([num2str(i),'/',num2str(v.NumberOfFrames)])
 end
+%%
+
+circle_int_d1 = diff(circ_int');
+count=0;
+bad_pillars = [];
+cutoff=[];
+time=[];
+for i=1:length(radii)
+    a_mean = mean(circle_int_d1(guide_index-50:guide_index+20,i));
+    a_stddev = std(circle_int_d1(guide_index-100:guide_index+20,i));
+    cutoff(i)=(abs(a_mean)+abs(a_stddev))*2.5;
+    
+    a = find(circle_int_d1(850:end,i)<-cutoff(i),1);
+    time(i)=a;
+    time(i) = find(circ_int(i,800:end)<50,1);
+    if isempty(a)
+        count = count+1;
+        bad_pillars(count) = i;
+    end
+end
+count
+pillar_info = horzcat(centers,horzcat(radii,(time+guide_index)'));
+
+%% Find # of neighbours when it detaches
+
+% remove pillars that detached abnormally early (probably cut in half)
+pillar_info(pillar_info(:,4)<400,:)=[];
+
+pillar_info(:,5) = zeros( length(pillar_info),1);
+for i=1:length(pillar_info)
+    d = pdist2(pillar_info(i,1:2),pillar_info([1:(i-1),(i+1):end],1:2));
+    
+    pillar_info(i,5) = sum(pillar_info(find(d<22),4)>pillar_info(i,4));
+end
+
+scatter3(pillar_info(:,1),pillar_info(:,2),pillar_info(:,5),40,pillar_info(:,5),'MarkerFaceColor','flat')
+xlim([0 800])
+ylim([0 800])
+colormap(copper)
+figure
+scatter3(pillar_info(:,1),pillar_info(:,2),pillar_info(:,5),40,pillar_info(:,5),'MarkerFaceColor','flat')
+xlim([0 800])
+ylim([0 800])
+colormap(copper)
 
 %% Extract the region where the pillars attach/unattach in the video
 disp('Extracting relevant frames')
