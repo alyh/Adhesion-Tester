@@ -3,7 +3,7 @@
 % read entire video
 v  = VideoReader('videos/new dino videos/10N preload test1.wmv.mp4');
 adhesion_data = csvread('data/05-28-2019 15:43- new dino fixture - 10N preload.csv');
-output_file = 'output/new dino videos/10N.csv';
+output_file = 'output/new dino videos/10N';
 
 frame_skipping =  3;
 full_intensity = zeros(length(1:frame_skipping:v.NumberOfFrames),1);
@@ -50,6 +50,12 @@ for i=1:v.NumberOfFrames
     end
     disp([num2str(i),'/',num2str(v.NumberOfFrames)])
 end
+
+writematrix(circ_int,[output_file,' - pillar intensity.csv']);
+
+%% OR import existing pillar intensity matrix
+% circ_int = csvread('output/new dino videos/10N - pillar intensity.csv');
+
 %%
 
 circle_int_d1 = diff(circ_int');
